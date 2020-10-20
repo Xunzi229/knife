@@ -8,13 +8,12 @@ import (
 type Inflection struct {
 	Reg     *regexp.Regexp
 	Replace string
-	Sites   []int
 }
 
 var (
 	Plurals      = make([]Inflection, 35)
 	Singulars    = make([]Inflection, 41)
-	Uncountables = make([]Inflection, 11)
+	Uncountables = make([]Inflection, 10)
 )
 
 func init() {
@@ -67,9 +66,9 @@ func init() {
 	reg = regexp.MustCompile(`(?i)(hive)$`)
 	Plurals[22] = Inflection{Reg: reg, Replace: `${1}s`}
 	reg = regexp.MustCompile(`(?i)(?:([^f])fe|([lr])f)$`)
-	Plurals[23] = Inflection{Reg: reg, Replace: `${1}${2}ves`, Sites: []int{2}}
+	Plurals[23] = Inflection{Reg: reg, Replace: `${1}${2}ves`}
 	reg = regexp.MustCompile(`(?i)sis$`)
-	Plurals[24] = Inflection{Reg: reg, Replace: `${1}ses`, Sites: []int{}}
+	Plurals[24] = Inflection{Reg: reg, Replace: `${1}ses`}
 	reg = regexp.MustCompile(`(?i)([ti])a$`)
 	Plurals[25] = Inflection{Reg: reg, Replace: `${1}a`}
 	reg = regexp.MustCompile(`(?i)([ti])um$`)
@@ -87,9 +86,9 @@ func init() {
 	reg = regexp.MustCompile(`(?i)^(ax|test)is$`)
 	Plurals[32] = Inflection{Reg: reg, Replace: `${1}es`}
 	reg = regexp.MustCompile(`(?i)s$`)
-	Plurals[33] = Inflection{Reg: reg, Replace: "s", Sites: []int{}}
+	Plurals[33] = Inflection{Reg: reg, Replace: "s"}
 	reg = regexp.MustCompile(`$`)
-	Plurals[34] = Inflection{Reg: reg, Replace: "s", Sites: []int{}}
+	Plurals[34] = Inflection{Reg: reg, Replace: "s"}
 
 	reg = regexp.MustCompile(`(?i)(h)ouse_corpuses$`)
 	Singulars[0] = Inflection{Reg: reg, Replace: "${1}ouse_corpus"}
@@ -172,7 +171,7 @@ func init() {
 	reg = regexp.MustCompile(`(?i)(ss)$`)
 	Singulars[39] = Inflection{Reg: reg, Replace: "${1}"}
 	reg = regexp.MustCompile(`(?i)s$`)
-	Singulars[40] = Inflection{Reg: reg, Replace: "", Sites: []int{}}
+	Singulars[40] = Inflection{Reg: reg, Replace: ""}
 
 	reg = regexp.MustCompile(`equipment`)
 	Uncountables[0] = Inflection{Reg: reg, Replace: "equipment"}
@@ -191,11 +190,10 @@ func init() {
 	reg = regexp.MustCompile(`sheep`)
 	Uncountables[7] = Inflection{Reg: reg, Replace: "sheep"}
 	reg = regexp.MustCompile(`jeans`)
-	Uncountables[9] = Inflection{Reg: reg, Replace: "jeans"}
+	Uncountables[8] = Inflection{Reg: reg, Replace: "jeans"}
 	reg = regexp.MustCompile(`police`)
-	Uncountables[10] = Inflection{Reg: reg, Replace: "police"}
+	Uncountables[9] = Inflection{Reg: reg, Replace: "police"}
 }
-
 
 func uncountable(str string) bool {
 	for i := 0; i < len(Uncountables); i++ {
@@ -225,14 +223,12 @@ func underscore(word string) string {
 	reg = regexp.MustCompile(`::`)
 	word = string(reg.ReplaceAll([]byte(word), []byte("/")))
 
-	//word.gsub!(/(?:(?<=([A-Za-z\d]))|\b)(#{inflections.acronym_regex})(?=\b|[^a-z])/) { "#{$1 && '_'.freeze }#{$2.downcase}" }
+	// word.gsub!(/(?:(?<=([A-Za-z\d]))|\b)(#{inflections.acronym_regex})(?=\b|[^a-z])/) { "#{$1 && '_'.freeze }#{$2.downcase}" }
 
 	reg = regexp.MustCompile(`([A-Z\d]+)([A-Z][a-z])`)
 	word = reg.ReplaceAllString(word, "${1}_${2}")
-
 	reg = regexp.MustCompile(`([a-z\d])([A-Z])`)
 	word = reg.ReplaceAllString(word, "${1}_${2}")
-
 	reg = regexp.MustCompile(`-`)
 	word = string(reg.ReplaceAll([]byte(word), []byte("_")))
 
@@ -241,7 +237,7 @@ func underscore(word string) string {
 }
 
 func applyInflections(word string, rules []Inflection) string {
-	if len(word) == 0 && uncountable(word) {
+	if len(word) == 0 || uncountable(word) {
 		return word
 	}
 
@@ -254,4 +250,27 @@ func applyInflections(word string, rules []Inflection) string {
 		}
 	}
 	return word
+}
+
+func Sub(str string, reg *regexp.Regexp, seg string) string {
+	sub := reg.FindAllSubmatchIndex([]byte(str), 2)
+
+	if len(sub) != 0 {
+		index := sub[0][0]
+		s := ""
+		if index > 0 {
+			r := sub[0]
+			index := r[0]
+			s += str[0:index]
+			s += seg
+			s += str[index+len(r) : len(str)]
+		}
+		return s
+	}
+	return str
+}
+
+func Gsub(str string, reg *regexp.Regexp, replace string) string {
+	res := reg.ReplaceAll([]byte(str), []byte(replace))
+	return string(res)
 }

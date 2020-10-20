@@ -3,41 +3,46 @@ package knife
 import (
 	"regexp"
 	"strings"
-	"unicode"
 )
 
 // Pluralize
-// 'post'.pluralize             => "posts"
-// 'octopus'.pluralize          => "octopi"
-// 'sheep'.pluralize            => "sheep"
-// 'words'.pluralize            => "words"
-// 'the blue mailman'.pluralize => "the blue mailmen"
-// 'CamelOctopus'.pluralize     => "CamelOctopi"
+// Pluralize("post")              => "posts"
+// Pluralize("octopus")           => "octopi"
+// Pluralize("sheep")             => "sheep"
+// Pluralize("words")             => "words"
+// Pluralize("the blue mailman")  => "the blue mailmen"
+// Pluralize("CamelOctopus")      => "CamelOctopi"
 func Pluralize(str string) string {
 	return applyInflections(str, Plurals)
 }
 
 //  Singularize
-//  'posts'.singularize            => "post"
-//  'octopi'.singularize           => "octopus"
-//  'sheep'.singularize            => "sheep"
-//  'word'.singularize             => "word"
-//  'the blue mailmen'.singularize => "the blue mailman"
-//  'CamelOctopi'.singularize      => "CamelOctopus"
-//  'leyes'.singularize(:es)       => "ley"
+//  Singularize("posts)            => "post"
+//  Singularize("octopi)           => "octopus"
+//  Singularize("sheep)            => "sheep"
+//  Singularize("word)             => "word"
+//  Singularize("the blue mailman") => "the blue mailman"
+//  Singularize("CamelOctopi)      => "CamelOctopus"
+//  Singularize("leyes)            => "leye"
 func Singularize(str string) string {
 	return applyInflections(str, Singulars)
 }
 
-// Camelize
-//  'active_record'.camelize => "ActiveRecord"
-//  'kai_xin'.camelize       => "KaiXin"
+//  Camelize
+//  Camelize("active_record") => "ActiveRecord"
+//  Camelize("kai_xin")       => "KaiXin"
 func Camelize(item string) string {
 	words := strings.Split(item, "_")
+
 	for i := 0; i < len(words); i++ {
 		str := words[i]
-		for i, v := range str {
-			words[i] = string(unicode.ToUpper(v)) + str[i+1:]
+
+		if len(str) > 0 {
+			r := str[0]
+			if 'a' <= r && r <= 'z' {
+				r -= 'a' - 'A'
+			}
+			words[i] = string(r) + str[1:]
 		}
 	}
 	return strings.Join(words, "")
@@ -46,9 +51,9 @@ func Camelize(item string) string {
 // Creates the name of a table like Rails does for models to table names. This method
 // uses the +pluralize+ method on the last word in the string.
 //
-//   'RawScaledScorer'.tableize => "raw_scaled_scorers"
-//   'ham_and_egg'.tableize     => "ham_and_eggs"
-//   'fancyCategory'.tableize   => "fancy_categories"
+//  Tableize("RawScaledScorer") => "raw_scaled_scorers"
+//  Tableize("ham_and_egg")     => "ham_and_eggs"
+//  Tableize("fancyCategory")   => "fancy_categories"
 func Tableize(tableName string) string {
 	return Pluralize(underscore(tableName))
 }
@@ -57,11 +62,11 @@ func Tableize(tableName string) string {
 // Note that this returns a string and not a class. (To convert to an actual class
 // follow +Classify+ with +constantize+.)
 //
-//   'ham_and_eggs'.classify  => "HamAndEgg"
-//   'posts'.classify        => "Post"
+//  Classify("ham_and_eggs")  => "HamAndEgg"
+//  Classify("posts")        => "Post"
 func Classify(tableName string) string {
 	reg := regexp.MustCompile(`.*\.`)
-	tableName = string(reg.ReplaceAll([]byte(tableName), []byte("")))
-	return Camelize(Singularize(tableName))
+	tableName = Sub(tableName, reg, "")
 
+	return Camelize(Singularize(tableName))
 }
