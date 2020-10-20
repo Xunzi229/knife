@@ -31,12 +31,6 @@ import "regexp"
   //  'active_record/errors'.camelize         => "ActiveRecord::Errors"
   //  'active_record/errors'.camelize(:lower) => "activeRecord::Errors"
   func Camelize(firstLetter string) string {
-      //case first_letter
-      //when :upper
-      //  ActiveSupport::Inflector.camelize(self, true)
-      //when :lower
-      //  ActiveSupport::Inflector.camelize(self, false)
-      //end
      return ""
   }
   func Camelcase(firstLetter string) string {
