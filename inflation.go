@@ -204,17 +204,8 @@ func uncountable(str string) bool {
 	return false
 }
 
-// Makes an underscored, lowercase form from the expression in the string.
-//
-// Changes '::' to '/' to convert namespaces to paths.
-//
-//   underscore('ActiveModel')         # => "active_model"
-//   underscore('ActiveModel::Errors') # => "active_model/errors"
-//
-// As a rule of thumb you can think of +underscore+ as the inverse of
-// #camelize, though there are cases where that does not hold:
-//
-//  Camelize(underscore('SSLError'))  # => "SslError"
+// underscore
+// underscore('UsersController')         # => "users_controller"
 func underscore(word string) string {
 	reg := regexp.MustCompile(`[A-Z-]|::`)
 	if !reg.Match([]byte(word)) {

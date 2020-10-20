@@ -48,9 +48,7 @@ func Camelize(item string) string {
 	return strings.Join(words, "")
 }
 
-// Creates the name of a table like Rails does for models to table names. This method
-// uses the +pluralize+ method on the last word in the string.
-//
+//  Tableize
 //  Tableize("RawScaledScorer") => "raw_scaled_scorers"
 //  Tableize("ham_and_egg")     => "ham_and_eggs"
 //  Tableize("fancyCategory")   => "fancy_categories"
@@ -58,10 +56,7 @@ func Tableize(tableName string) string {
 	return Pluralize(underscore(tableName))
 }
 
-// Creates a class name from a plural table name like Rails does for table names to models.
-// Note that this returns a string and not a class. (To convert to an actual class
-// follow +Classify+ with +constantize+.)
-//
+//  Classify
 //  Classify("ham_and_eggs")  => "HamAndEgg"
 //  Classify("posts")        => "Post"
 func Classify(tableName string) string {
