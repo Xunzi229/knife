@@ -7,3 +7,4 @@ nohup.out
 .DS_Store
 .rakeTasks
 .idea
+.idea/*

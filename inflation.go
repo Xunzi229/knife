@@ -196,6 +196,7 @@ func init() {
 	Uncountables[10] = Inflection{Reg: reg, Replace: "police"}
 }
 
+
 func uncountable(str string) bool {
 	for i := 0; i < len(Uncountables); i++ {
 		if Uncountables[i].Reg.Match([]byte(str)) {
